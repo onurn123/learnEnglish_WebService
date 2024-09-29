@@ -59,11 +59,15 @@ public class wordController : ControllerBase
                 Word_Count = _context.words.ToList().Count
             });
 
-        return Ok(word);
+        return Ok(new WordTransactionResponse{
+            IsSuccess = true,
+            Message = "Word retrieved successfully",
+            Words = new List<Words> { word },
+            Word_Count = 1
+        });
     }
     // Add a new word
-    [HttpPost]
-    [Route("add")]
+    [HttpPost("add")]
     public IActionResult AddWord([FromBody] Words word)
     {
         // Add a new word to the database if not existing already in database , return WordTransactionResponse
