@@ -14,8 +14,11 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddDbContext<dbContext>(options =>
         options.UseSqlServer(connectionString));
 builder.Services.AddCors(options =>
-         options.AddPolicy(MyAllowSpecificOrigins, p => p.WithOrigins("http://leapi.onurcanin.com")
-                                                   ));
+         options.AddPolicy(MyAllowSpecificOrigins, p => p.WithOrigins(
+                ["https://le.onurcanin.com",
+                "http://le.onurcanin.com",
+                "http://localhost:3000"])
+                ));
 builder.Services.AddControllers();
 var app = builder.Build();
 
