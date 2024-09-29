@@ -18,7 +18,10 @@ builder.Services.AddCors(options =>
                 ["https://le.onurcanin.com",
                 "http://le.onurcanin.com",
                 "http://localhost:3000"])
+                .AllowAnyHeader()
+                .AllowAnyMethod()
                 ));
+
 builder.Services.AddControllers();
 var app = builder.Build();
 
