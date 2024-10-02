@@ -36,6 +36,7 @@ public class userController : ControllerBase
             {
                 IsSuccess = false,
                 Message = "Invalid email or password",
+                Token= null
             });
 
         return Ok(new LoginResponse
