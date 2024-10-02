@@ -8,7 +8,7 @@ public class LoginResponse{
 
     public required string Message { get; set; }
 
-    public string Token { get; set; }
+    public required string Token { get; set; }
 
     public  UserModel? User {get; set; } 
 }
