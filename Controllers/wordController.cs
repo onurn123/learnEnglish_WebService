@@ -1,6 +1,8 @@
+using HT.Core;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Core.ApplicationDatabaseContext;
 using WebApplication1.Core.BaseModels;
+using WebApplication1.Core.RequestModels;
 using WebApplication1.Core.ResponseModels;
 
 namespace WebApplication1.Controllers;
@@ -17,12 +19,49 @@ public class wordController : ControllerBase
         // Constructor for WordController
         _context = db;
     }
+
+    //Authentication
+    public bool IsValidRequest(string token)
+    {
+        try
+        {
+            if (token == null)
+            {
+                return false;
+
+            }
+            string openKey = token.Decrypt();
+            string loginTime = openKey.Split('+')[1];
+            DateTime time = Convert.ToDateTime(loginTime);
+            if (DateTime.Now.Subtract(time).Minutes > 5)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+
+    }
     // Controller for Words operations
 
     // Get all words
-    [HttpGet("get")]
-    public IActionResult GetWords()
+    [HttpPost("get")]
+    public IActionResult GetWords(WordRequest request)
     {
+        if (IsValidRequest(request.Token) == false)
+        {
+            return Unauthorized(new WordTransactionResponse
+            {
+                IsSuccess = false,
+                Message = "Token is invalid",
+            });
+        }
         // Return all words from the database return WordTransactionResponse
         if (_context.words.ToList() != null)
         {
@@ -44,12 +83,20 @@ public class wordController : ControllerBase
 
     }
     // Get a word by id
-    [HttpGet("get/{id}")]
-    public IActionResult GetWordById(int id)
+    [HttpPost("getbyid")]
+    public IActionResult GetWordById(WordRequest request)
     {
-        // Return a word by id from the database
 
-        var word = _context.words.Find(id);
+        // Return a word by id from the database
+        if (IsValidRequest(request.Token) == false)
+        {
+            return Unauthorized(new WordTransactionResponse
+            {
+                IsSuccess = false,
+                Message = "Token is invalid",
+            });
+        }
+        var word = _context.words.Find(request.id);
         if (word == null)
             return NotFound(new WordTransactionResponse
             {
@@ -59,7 +106,8 @@ public class wordController : ControllerBase
                 Word_Count = _context.words.ToList().Count
             });
 
-        return Ok(new WordTransactionResponse{
+        return Ok(new WordTransactionResponse
+        {
             IsSuccess = true,
             Message = "Word retrieved successfully",
             Words = new List<Words> { word },
@@ -68,10 +116,18 @@ public class wordController : ControllerBase
     }
     // Add a new word
     [HttpPost("add")]
-    public IActionResult AddWord([FromBody] Words word)
+    public IActionResult AddWord([FromBody] WordRequest request)
     {
         // Add a new word to the database if not existing already in database , return WordTransactionResponse
-        if (_context.words.Any(x => x.word_english == word.word_english))
+        if (IsValidRequest(request.Token) == false)
+        {
+            return Unauthorized(new WordTransactionResponse
+            {
+                IsSuccess = false,
+                Message = "Token is invalid",
+            });
+        }
+        if (_context.words.Any(x => x.word_english == request.Word.word_english))
             return BadRequest(new WordTransactionResponse
             {
                 IsSuccess = false,
@@ -79,7 +135,7 @@ public class wordController : ControllerBase
                 Words = _context.words.ToList(),
                 Word_Count = _context.words.ToList().Count
             });
-        _context.words.Add(word);
+        _context.words.Add(request.Word);
         _context.SaveChanges();
         return Ok(new WordTransactionResponse
         {
@@ -93,11 +149,19 @@ public class wordController : ControllerBase
 
     }
     // Update an existing word
-    [HttpPost("update/{id}")]
-    public IActionResult UpdateWord(int id , [FromBody] Words word)
+    [HttpPost("update")]
+    public IActionResult UpdateWord([FromBody] WordRequest request)
     {
         // Update an existing word in the database if it exists , return WordTransactionResponse
-        var dbWord = _context.words.Find(id);
+        if (IsValidRequest(request.Token) == false)
+        {
+            return Unauthorized(new WordTransactionResponse
+            {
+                IsSuccess = false,
+                Message = "Token is invalid",
+            });
+        }
+        var dbWord = _context.words.Find(request.id);
         if (dbWord == null)
             return NotFound(new WordTransactionResponse
             {
@@ -107,8 +171,8 @@ public class wordController : ControllerBase
                 Word_Count = _context.words.ToList().Count
             });
 
-        dbWord.word_english = word.word_english;
-        dbWord.word_turkish = word.word_turkish;
+        dbWord.word_english = request.Word.word_english;
+        dbWord.word_turkish = request.Word.word_turkish;
         _context.SaveChanges();
         return Ok(new WordTransactionResponse
         {
@@ -120,11 +184,19 @@ public class wordController : ControllerBase
         });
     }
     // Delete a word by id
-    [HttpPost("delete/{id}")]
-    public IActionResult DeleteWord(int id)
+    [HttpPost("delete")]
+    public IActionResult DeleteWord(WordRequest request)
     {
         // Delete a word from the database if it exists , return WordTransactionResponse
-        var dbWord = _context.words.Find(id);
+        if (IsValidRequest(request.Token) == false)
+        {
+            return Unauthorized(new WordTransactionResponse
+            {
+                IsSuccess = false,
+                Message = "Token is invalid",
+            });
+        }
+        var dbWord = _context.words.Find(request.id);
         if (dbWord == null)
             return NotFound(new WordTransactionResponse
             {
