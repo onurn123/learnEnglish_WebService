@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -14,11 +15,11 @@ namespace WebApplication1.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    user_mail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    user_password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    user_registration_date = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_mail = table.Column<string>(type: "text", nullable: false),
+                    user_password = table.Column<string>(type: "text", nullable: false),
+                    user_registration_date = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,10 +30,10 @@ namespace WebApplication1.Migrations
                 name: "words",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    word_english = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    word_turkish = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    word_english = table.Column<string>(type: "text", nullable: false),
+                    word_turkish = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

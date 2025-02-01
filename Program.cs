@@ -13,13 +13,14 @@ string connectionString = config["ConnectionStrings:DefaultServer"];
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
-builder.Services.AddDbContext<dbContext>(options =>
-        options.UseSqlServer(connectionString));
+builder.Services.AddEntityFrameworkNpgsql().AddDbContext<dbContext>(options =>
+        options.UseNpgsql(connectionString));
 builder.Services.AddCors(options =>
          options.AddPolicy(MyAllowSpecificOrigins, p => p.WithOrigins(
                 ["https://le.onurcanin.com",
                 "http://le.onurcanin.com",
-                "http://localhost:3000"])
+                "http://localhost:3000",
+                "http://localhost:3001",])
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 ));
